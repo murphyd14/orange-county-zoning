@@ -490,7 +490,7 @@ function selectFeature(feature) {
   
   const infoPanel = document.createElement("div");
   infoPanel.style.cssText = `
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -506,6 +506,7 @@ function selectFeature(feature) {
     max-width: 400px;
     max-height: 80vh;
     overflow-y: auto;
+    backdrop-filter: blur(4px);
   `;
 
   const header = document.createElement("div");
@@ -610,23 +611,25 @@ function addLegend() {
     position: absolute;
     bottom: 20px;
     right: 20px;
-    background: rgba(22, 26, 46, 0.9);
+    background: rgba(22, 26, 46, 0.95);
     color: #e9edf5;
-    padding: 12px;
-    border-radius: 8px;
+    padding: 16px;
+    border-radius: 12px;
     border: 1px solid #2a3152;
     font-family: Arial, sans-serif;
     font-size: 12px;
     z-index: 1000;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    min-width: 180px;
   `;
 
   legend.innerHTML = `
-    <div style="margin-bottom: 8px; font-weight: bold; color: #6aa6ff;">Zoning Categories</div>
+    <div style="margin-bottom: 12px; font-weight: bold; color: #6aa6ff; font-size: 13px;">Zoning Categories</div>
     ${Object.entries(colors).map(([category, color]) => `
-      <div style="display: flex; align-items: center; margin-bottom: 4px;">
-        <div style="width: 12px; height: 12px; background: ${color}; border-radius: 2px; margin-right: 8px;"></div>
-        <span>${category}</span>
+      <div style="display: flex; align-items: center; margin-bottom: 6px;">
+        <div style="width: 14px; height: 14px; background: ${color}; border-radius: 3px; margin-right: 10px; border: 1px solid rgba(255,255,255,0.2);"></div>
+        <span style="font-size: 11px;">${category}</span>
       </div>
     `).join("")}
   `;
@@ -924,9 +927,10 @@ function createAnalyticsPanel() {
 
   state.analyticsPanel = document.createElement("div");
   state.analyticsPanel.style.cssText = `
-    position: absolute;
-    bottom: 20px;
-    left: 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background: rgba(22, 26, 46, 0.95);
     color: #e9edf5;
     padding: 20px;
@@ -936,13 +940,14 @@ function createAnalyticsPanel() {
     font-size: 12px;
     z-index: 1000;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    width: 75%;
-    max-width: 1000px;
-    height: 30vh;
-    max-height: 400px;
+    width: 90%;
+    max-width: 1200px;
+    height: 60vh;
+    max-height: 600px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    backdrop-filter: blur(4px);
   `;
 
   const header = document.createElement("div");
@@ -950,18 +955,18 @@ function createAnalyticsPanel() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    padding: 16px 20px;
     background: linear-gradient(135deg, #6aa6ff, #7ad0c9);
     color: white;
     border-radius: 8px 8px 0 0;
-    margin: -20px -20px 12px -20px;
+    margin: -20px -20px 20px -20px;
   `;
 
   const title = document.createElement("h3");
   title.textContent = "📈 Analytics Dashboard";
   title.style.cssText = `
     margin: 0;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
   `;
 
@@ -971,11 +976,11 @@ function createAnalyticsPanel() {
     background: none;
     border: none;
     color: white;
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
     padding: 0;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -995,7 +1000,7 @@ function createAnalyticsPanel() {
     flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
+    gap: 20px;
     overflow: hidden;
   `;
 
@@ -1011,7 +1016,7 @@ function createAnalyticsPanel() {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid #2a3152;
       border-radius: 8px;
-      padding: 8px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       min-height: 0;
@@ -1020,8 +1025,8 @@ function createAnalyticsPanel() {
     const chartTitle = document.createElement("h4");
     chartTitle.textContent = chartInfo.title;
     chartTitle.style.cssText = `
-      margin: 0 0 6px 0;
-      font-size: 12px;
+      margin: 0 0 12px 0;
+      font-size: 14px;
       font-weight: 600;
       color: #6aa6ff;
       text-align: center;
@@ -1031,7 +1036,7 @@ function createAnalyticsPanel() {
     canvas.id = chartInfo.id;
     canvas.style.cssText = `
       flex: 1;
-      max-height: 120px;
+      max-height: 300px;
     `;
 
     container.appendChild(chartTitle);
