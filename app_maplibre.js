@@ -490,10 +490,9 @@ function selectFeature(feature) {
   
   const infoPanel = document.createElement("div");
   infoPanel.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 20px;
+    right: 20px;
     background: rgba(22, 26, 46, 0.95);
     color: #e9edf5;
     padding: 20px;
@@ -595,7 +594,7 @@ function selectFeature(feature) {
   `;
 
   infoPanel.appendChild(content);
-  document.body.appendChild(infoPanel);
+  document.getElementById("map").appendChild(infoPanel);
 }
 
 function formatDate(ms) {
@@ -611,25 +610,23 @@ function addLegend() {
     position: absolute;
     bottom: 20px;
     right: 20px;
-    background: rgba(22, 26, 46, 0.95);
+    background: rgba(22, 26, 46, 0.9);
     color: #e9edf5;
-    padding: 16px;
-    border-radius: 12px;
+    padding: 12px;
+    border-radius: 8px;
     border: 1px solid #2a3152;
     font-family: Arial, sans-serif;
     font-size: 12px;
     z-index: 1000;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    backdrop-filter: blur(4px);
-    min-width: 180px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
   `;
 
   legend.innerHTML = `
-    <div style="margin-bottom: 12px; font-weight: bold; color: #6aa6ff; font-size: 13px;">Zoning Categories</div>
+    <div style="margin-bottom: 8px; font-weight: bold; color: #6aa6ff;">Zoning Categories</div>
     ${Object.entries(colors).map(([category, color]) => `
-      <div style="display: flex; align-items: center; margin-bottom: 6px;">
-        <div style="width: 14px; height: 14px; background: ${color}; border-radius: 3px; margin-right: 10px; border: 1px solid rgba(255,255,255,0.2);"></div>
-        <span style="font-size: 11px;">${category}</span>
+      <div style="display: flex; align-items: center; margin-bottom: 4px;">
+        <div style="width: 12px; height: 12px; background: ${color}; border-radius: 2px; margin-right: 8px;"></div>
+        <span>${category}</span>
       </div>
     `).join("")}
   `;
@@ -927,7 +924,7 @@ function createAnalyticsPanel() {
 
   state.analyticsPanel = document.createElement("div");
   state.analyticsPanel.style.cssText = `
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -1128,7 +1125,7 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
     if (state.charts.areaByGroup) {
       state.charts.areaByGroup.destroy();
     }
-    
+
     const groupData = Object.entries(areaByGroup)
       .map(([key, value]) => ({ key, area_acres: value }))
       .sort((a, b) => b.area_acres - a.area_acres);
@@ -1168,7 +1165,7 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
     if (state.charts.countsByYear) {
       state.charts.countsByYear.destroy();
     }
-    
+
     const yearData = Object.entries(countsByYear)
       .map(([year, count]) => ({ year: Number(year), count }))
       .sort((a, b) => a.year - b.year);
@@ -1210,7 +1207,7 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
     if (state.charts.areaByCode) {
       state.charts.areaByCode.destroy();
     }
-    
+
     const codeData = Object.entries(areaByCode)
       .map(([key, value]) => ({ key, area_acres: value }))
       .sort((a, b) => b.area_acres - a.area_acres)
