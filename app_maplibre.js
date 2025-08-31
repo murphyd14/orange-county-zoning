@@ -34,23 +34,23 @@ const colors = {
 // Initialize the application
 async function init() {
   console.log("🚀 Initializing MapLibre GL application...");
-  
+
   // Enable PMTiles protocol
   const protocol = new pmtiles.Protocol();
   maplibregl.addProtocol("pmtiles", protocol.tile);
-  
+
   // Initialize map
   initMap();
-  
+
   // Load data
   await loadData();
-  
+
   // Wire controls
   wireControls();
-  
+
   // Add legend
   addLegend();
-  
+
   console.log("✅ Application initialized");
 }
 
@@ -87,18 +87,18 @@ function initMap() {
 
   // Add attribution control
   state.map.addControl(new maplibregl.AttributionControl(), "bottom-right");
-  
+
   // Add navigation control
   state.map.addControl(new maplibregl.NavigationControl(), "top-right");
 }
 
 async function loadData() {
   console.log("📦 Loading data...");
-  
+
   try {
     // Try to load PMTiles first (for production)
     const pmtilesAvailable = await checkPMTilesAvailability();
-    
+
     if (pmtilesAvailable) {
       console.log("✅ Using PMTiles for optimal performance");
       await loadPMTilesData();
@@ -106,10 +106,9 @@ async function loadData() {
       console.log("📄 Using optimized GeoJSON (fallback)");
       await loadOptimizedGeoJSON();
     }
-    
+
     // Fit map to data bounds
     fitMapToData();
-    
   } catch (error) {
     console.error("❌ Error loading data:", error);
     showNotification("Failed to load data. Please refresh the page.", "error");
@@ -304,7 +303,6 @@ async function loadOptimizedGeoJSON() {
     state.map.on("mouseleave", "zoning-fill", () => {
       state.map.getCanvas().style.cursor = "";
     });
-
   } catch (error) {
     console.error("Error loading optimized GeoJSON:", error);
     throw error;
@@ -331,7 +329,7 @@ function fitMapToData() {
         }
       }
     });
-    
+
     if (!bounds.isEmpty()) {
       state.map.fitBounds(bounds, { padding: 50 });
     }
@@ -429,7 +427,10 @@ function applyFilters() {
     const props = feature.properties;
 
     // Group filter
-    if (state.filters.group !== "ALL" && props.z_group !== state.filters.group) {
+    if (
+      state.filters.group !== "ALL" &&
+      props.z_group !== state.filters.group
+    ) {
       return false;
     }
 
@@ -442,7 +443,10 @@ function applyFilters() {
       ? new Date(props.MAINT_DATE).getFullYear()
       : null;
 
-    if (year && (year < state.filters.yearMin || year > state.filters.yearMax)) {
+    if (
+      year &&
+      (year < state.filters.yearMin || year > state.filters.yearMax)
+    ) {
       return false;
     }
 
@@ -487,7 +491,7 @@ function applyFilters() {
 
 function selectFeature(feature) {
   const props = feature.properties;
-  
+
   const infoPanel = document.createElement("div");
   infoPanel.style.cssText = `
     position: absolute;
@@ -557,40 +561,77 @@ function selectFeature(feature) {
   content.innerHTML = `
     <div style="margin-bottom: 12px;">
       <span style="color: #6aa6ff; font-weight: bold;">Zoning Code:</span>
-      <span style="color: #e9edf5; font-weight: bold;"> ${props.ZONING || "—"}</span>
+      <span style="color: #e9edf5; font-weight: bold;"> ${
+        props.ZONING || "—"
+      }</span>
     </div>
     <div style="margin-bottom: 12px;">
       <span style="color: #7ad0c9; font-weight: bold;">Category:</span>
-      <span style="color: #e9edf5; font-weight: bold;"> ${props.z_group || "—"}</span>
+      <span style="color: #e9edf5; font-weight: bold;"> ${
+        props.z_group || "—"
+      }</span>
     </div>
-    ${props.PD_NAME ? `<div style="margin-bottom: 12px;">
+    ${
+      props.PD_NAME
+        ? `<div style="margin-bottom: 12px;">
       <span style="color: #ffb057; font-weight: bold;">PD Name:</span>
       <span style="color: #e9edf5;"> ${props.PD_NAME}</span>
-    </div>` : ""}
-    ${props.ZONINGOLD ? `<div style="margin-bottom: 12px;">
+    </div>`
+        : ""
+    }
+    ${
+      props.ZONINGOLD
+        ? `<div style="margin-bottom: 12px;">
       <span style="color: #c07bff; font-weight: bold;">Previous Zoning:</span>
       <span style="color: #e9edf5;"> ${props.ZONINGOLD}</span>
-    </div>` : ""}
-    ${props.area_acres ? `<div style="margin-bottom: 12px;">
+    </div>`
+        : ""
+    }
+    ${
+      props.area_acres
+        ? `<div style="margin-bottom: 12px;">
       <span style="color: #ffd86e; font-weight: bold;">Area:</span>
-      <span style="color: #e9edf5;"> ${Number(props.area_acres).toLocaleString(undefined, { maximumFractionDigits: 2 })} acres</span>
-    </div>` : ""}
-    ${props.BCC_DATE ? `<div style="margin-bottom: 12px;">
+      <span style="color: #e9edf5;"> ${Number(props.area_acres).toLocaleString(
+        undefined,
+        { maximumFractionDigits: 2 }
+      )} acres</span>
+    </div>`
+        : ""
+    }
+    ${
+      props.BCC_DATE
+        ? `<div style="margin-bottom: 12px;">
       <span style="color: #87d4a5; font-weight: bold;">BCC Date:</span>
       <span style="color: #e9edf5;"> ${formatDate(props.BCC_DATE)}</span>
-    </div>` : ""}
-    ${props.P_Z_DATE ? `<div style="margin-bottom: 12px;">
+    </div>`
+        : ""
+    }
+    ${
+      props.P_Z_DATE
+        ? `<div style="margin-bottom: 12px;">
       <span style="color: #778899; font-weight: bold;">Proposed Date:</span>
       <span style="color: #e9edf5;"> ${formatDate(props.P_Z_DATE)}</span>
-    </div>` : ""}
-    ${props.MAINT_DATE ? `<div style="margin-bottom: 12px;">
+    </div>`
+        : ""
+    }
+    ${
+      props.MAINT_DATE
+        ? `<div style="margin-bottom: 12px;">
       <span style="color: #b3b6c2; font-weight: bold;">Maintenance Date:</span>
       <span style="color: #e9edf5;"> ${formatDate(props.MAINT_DATE)}</span>
-    </div>` : ""}
-    ${props.centroid_lat && props.centroid_lon ? `<div style="margin-bottom: 12px;">
+    </div>`
+        : ""
+    }
+    ${
+      props.centroid_lat && props.centroid_lon
+        ? `<div style="margin-bottom: 12px;">
       <span style="color: #6aa6ff; font-weight: bold;">Centroid:</span>
-      <span style="color: #e9edf5;"> ${props.centroid_lat.toFixed(4)}, ${props.centroid_lon.toFixed(4)}</span>
-    </div>` : ""}
+      <span style="color: #e9edf5;"> ${props.centroid_lat.toFixed(
+        4
+      )}, ${props.centroid_lon.toFixed(4)}</span>
+    </div>`
+        : ""
+    }
   `;
 
   infoPanel.appendChild(content);
@@ -623,12 +664,16 @@ function addLegend() {
 
   legend.innerHTML = `
     <div style="margin-bottom: 8px; font-weight: bold; color: #6aa6ff;">Zoning Categories</div>
-    ${Object.entries(colors).map(([category, color]) => `
+    ${Object.entries(colors)
+      .map(
+        ([category, color]) => `
       <div style="display: flex; align-items: center; margin-bottom: 4px;">
         <div style="width: 12px; height: 12px; background: ${color}; border-radius: 2px; margin-right: 8px;"></div>
         <span>${category}</span>
       </div>
-    `).join("")}
+    `
+      )
+      .join("")}
   `;
 
   document.getElementById("map").appendChild(legend);
@@ -642,7 +687,7 @@ function exportFilteredData() {
   }
 
   const filteredData = getCurrentFilteredData();
-  
+
   if (filteredData.length === 0) {
     showNotification("No data matches current filters", "error");
     return;
@@ -728,7 +773,10 @@ function getCurrentFilteredData() {
     const props = feature.properties;
 
     // Group filter
-    if (state.filters.group !== "ALL" && props.z_group !== state.filters.group) {
+    if (
+      state.filters.group !== "ALL" &&
+      props.z_group !== state.filters.group
+    ) {
       return false;
     }
 
@@ -741,7 +789,10 @@ function getCurrentFilteredData() {
       ? new Date(props.MAINT_DATE).getFullYear()
       : null;
 
-    if (year && (year < state.filters.yearMin || year > state.filters.yearMax)) {
+    if (
+      year &&
+      (year < state.filters.yearMin || year > state.filters.yearMax)
+    ) {
       return false;
     }
 
@@ -1059,11 +1110,11 @@ function updateAnalyticsFromFeatures(features) {
 
   features.forEach((feature) => {
     const props = feature.properties;
-    
+
     // Area by group
     const group = props.z_group || "Other";
     areaByGroup[group] = (areaByGroup[group] || 0) + (props.area_acres || 0);
-    
+
     // Counts by year
     const year = props.BCC_DATE
       ? new Date(props.BCC_DATE).getFullYear()
@@ -1072,11 +1123,11 @@ function updateAnalyticsFromFeatures(features) {
       : props.MAINT_DATE
       ? new Date(props.MAINT_DATE).getFullYear()
       : null;
-    
+
     if (year && year > 1900) {
       countsByYear[year] = (countsByYear[year] || 0) + 1;
     }
-    
+
     // Area by code
     const code = props.ZONING || "Unknown";
     areaByCode[code] = (areaByCode[code] || 0) + (props.area_acres || 0);
@@ -1264,9 +1315,9 @@ function showNotification(message, type = "info") {
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   `;
   notification.textContent = message;
-  
+
   document.body.appendChild(notification);
-  
+
   setTimeout(() => {
     notification.remove();
   }, 3000);
