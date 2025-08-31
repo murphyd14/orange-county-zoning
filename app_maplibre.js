@@ -506,14 +506,14 @@ function selectFeature(feature) {
     right: 20px;
     background: rgba(22, 26, 46, 0.95);
     color: #e9edf5;
-    padding: clamp(16px, 2vw, 20px);
-    border-radius: clamp(10px, 1.5vw, 12px);
+    padding: 20px;
+    border-radius: 12px;
     border: 1px solid #2a3152;
     font-family: Arial, sans-serif;
-    font-size: clamp(12px, 1.5vw, 14px);
+    font-size: 14px;
     z-index: 1000;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    width: clamp(300px, 25vw, 400px);
+    max-width: 400px;
     max-height: 80vh;
     overflow-y: auto;
     backdrop-filter: blur(4px);
@@ -660,15 +660,13 @@ function addLegend() {
     right: 20px;
     background: rgba(22, 26, 46, 0.9);
     color: #e9edf5;
-    padding: clamp(10px, 1.5vw, 12px);
-    border-radius: clamp(6px, 1vw, 8px);
+    padding: 12px;
+    border-radius: 8px;
     border: 1px solid #2a3152;
     font-family: Arial, sans-serif;
-    font-size: clamp(10px, 1.2vw, 12px);
+    font-size: 12px;
     z-index: 1000;
     box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-    width: clamp(180px, 15vw, 220px);
-    max-width: calc(100vw - 420px);
   `;
 
   legend.innerHTML = `
@@ -987,7 +985,6 @@ function createAnalyticsPanel() {
     position: absolute;
     bottom: 20px;
     left: 380px;
-    right: 20px;
     background: rgba(22, 26, 46, 0.98);
     color: #e9edf5;
     padding: 0;
@@ -997,9 +994,10 @@ function createAnalyticsPanel() {
     font-size: 12px;
     z-index: 1000;
     box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+    width: calc(100% - 420px);
+    max-width: 800px;
     height: 35vh;
     max-height: 450px;
-    min-height: 300px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1011,7 +1009,7 @@ function createAnalyticsPanel() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: clamp(16px, 2vw, 20px) clamp(20px, 2.5vw, 24px);
+    padding: 20px 24px;
     background: linear-gradient(135deg, rgba(106, 166, 255, 0.95), rgba(122, 208, 201, 0.95));
     color: white;
     border-radius: 16px 16px 0 0;
@@ -1024,7 +1022,7 @@ function createAnalyticsPanel() {
   title.textContent = "📈 Analytics Dashboard";
   title.style.cssText = `
     margin: 0;
-    font-size: clamp(16px, 2.5vw, 20px);
+    font-size: 20px;
     font-weight: 700;
     letter-spacing: -0.02em;
   `;
@@ -1035,15 +1033,15 @@ function createAnalyticsPanel() {
     background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
-    font-size: clamp(16px, 2vw, 20px);
+    font-size: 20px;
     cursor: pointer;
     padding: 0;
-    width: clamp(28px, 3vw, 32px);
-    height: clamp(28px, 3vw, 32px);
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: clamp(6px, 1vw, 8px);
+    border-radius: 8px;
     transition: all 0.2s ease;
     backdrop-filter: blur(10px);
   `;
@@ -1060,8 +1058,8 @@ function createAnalyticsPanel() {
     flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: clamp(12px, 2vw, 24px);
-    padding: clamp(16px, 2vw, 24px);
+    gap: 24px;
+    padding: 24px;
     overflow: hidden;
   `;
 
@@ -1076,8 +1074,8 @@ function createAnalyticsPanel() {
     container.style.cssText = `
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(106, 166, 255, 0.15);
-      border-radius: clamp(8px, 1.5vw, 12px);
-      padding: clamp(12px, 1.5vw, 20px);
+      border-radius: 12px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       min-height: 0;
@@ -1088,8 +1086,8 @@ function createAnalyticsPanel() {
     const chartTitle = document.createElement("h4");
     chartTitle.textContent = chartInfo.title;
     chartTitle.style.cssText = `
-      margin: 0 0 clamp(8px, 1.5vw, 16px) 0;
-      font-size: clamp(12px, 1.5vw, 15px);
+      margin: 0 0 16px 0;
+      font-size: 15px;
       font-weight: 600;
       color: #6aa6ff;
       text-align: center;
@@ -1101,8 +1099,7 @@ function createAnalyticsPanel() {
     canvas.style.cssText = `
       flex: 1;
       max-height: 320px;
-      min-height: 200px;
-      border-radius: clamp(6px, 1vw, 8px);
+      border-radius: 8px;
     `;
 
     container.appendChild(chartTitle);
@@ -1116,24 +1113,6 @@ function createAnalyticsPanel() {
   // Create charts with current filtered data
   const filteredData = getCurrentFilteredData();
   updateAnalyticsFromFeatures(filteredData);
-
-  // Add resize handler for responsive positioning
-  const handleResize = () => {
-    if (state.analyticsPanel) {
-      const sidebarWidth = 380; // Fixed sidebar width
-      const rightMargin = 20;
-      const legendWidth = Math.min(220, window.innerWidth * 0.15);
-
-      state.analyticsPanel.style.left = `${sidebarWidth}px`;
-      state.analyticsPanel.style.right = `${legendWidth + rightMargin * 2}px`;
-    }
-  };
-
-  // Initial positioning
-  handleResize();
-
-  // Listen for window resize
-  window.addEventListener("resize", handleResize);
 }
 
 function updateAnalyticsFromFeatures(features) {
@@ -1181,12 +1160,9 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
       legend: {
         labels: {
           color: "#e9edf5",
-          font: {
-            size: Math.max(8, Math.min(12, window.innerWidth / 100)),
-            weight: "500",
-          },
+          font: { size: 10, weight: "500" },
           usePointStyle: true,
-          padding: Math.max(4, Math.min(8, window.innerWidth / 200)),
+          padding: 6,
         },
       },
       tooltip: {
@@ -1197,33 +1173,18 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
         borderWidth: 1,
         cornerRadius: 8,
         displayColors: true,
-        titleFont: {
-          size: Math.max(10, Math.min(14, window.innerWidth / 80)),
-          weight: "600",
-        },
-        bodyFont: { size: Math.max(9, Math.min(12, window.innerWidth / 100)) },
+        titleFont: { size: 12, weight: "600" },
+        bodyFont: { size: 11 },
       },
     },
     scales: {
       x: {
-        ticks: {
-          color: "#9aa3b2",
-          font: {
-            size: Math.max(8, Math.min(12, window.innerWidth / 120)),
-            weight: "500",
-          },
-        },
+        ticks: { color: "#9aa3b2", font: { size: 10, weight: "500" } },
         grid: { color: "rgba(154, 163, 178, 0.08)", drawBorder: false },
         border: { color: "rgba(154, 163, 178, 0.2)" },
       },
       y: {
-        ticks: {
-          color: "#9aa3b2",
-          font: {
-            size: Math.max(8, Math.min(12, window.innerWidth / 120)),
-            weight: "500",
-          },
-        },
+        ticks: { color: "#9aa3b2", font: { size: 10, weight: "500" } },
         grid: { color: "rgba(154, 163, 178, 0.08)", drawBorder: false },
         border: { color: "rgba(154, 163, 178, 0.2)" },
       },
