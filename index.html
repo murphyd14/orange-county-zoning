@@ -3,16 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Orange County Zoning Explorer - MapLibre</title>
+    <title>OCFL Zoning Explorer • Black & Gold</title>
     <link rel="stylesheet" href="./styles.css" />
 
+    <!-- MapLibre + PMTiles -->
     <link
       href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"
       rel="stylesheet"
     />
-    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-    <script src="https://unpkg.com/pmtiles@3.0.6/dist/pmtiles.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script
+      defer
+      src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"
+    ></script>
+    <script
+      defer
+      src="https://unpkg.com/pmtiles@3.0.6/dist/pmtiles.js"
+    ></script>
+
+    <!-- Chart.js -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
+    ></script>
   </head>
   <body>
     <div id="app">
@@ -24,7 +36,7 @@
 
           <label>
             Zoning Group
-            <select id="groupFilter">
+            <select id="groupFilter" aria-label="Zoning Group">
               <option value="ALL" selected>All Groups</option>
               <option value="Residential">Residential</option>
               <option value="Commercial">Commercial</option>
@@ -83,17 +95,20 @@
               type="text"
               id="searchInput"
               placeholder="Search by zoning code, category, or PD name..."
+              aria-label="Search by zoning code, category, or PD name"
             />
           </label>
 
-          <div class="toggle-group">
+          <div class="toggle-group" role="group" aria-label="Layer toggles">
             <label class="toggle-item">
-              <input type="checkbox" id="toggleZoning" checked />
-              <span>Zone Districts</span>
+              <input type="checkbox" id="toggleZoning" checked /><span
+                >Zone Districts</span
+              >
             </label>
             <label class="toggle-item">
-              <input type="checkbox" id="toggleFLU" />
-              <span>Future Land Use</span>
+              <input type="checkbox" id="toggleFLU" /><span
+                >Future Land Use</span
+              >
             </label>
           </div>
         </section>
@@ -104,7 +119,9 @@
             <button id="analyticsBtn" class="action-btn">
               📈 Analytics Dashboard
             </button>
-            <button id="aboutBtn" class="action-btn">ℹ️ About & Data</button>
+            <button id="aboutBtn" class="action-btn">
+              ℹ️ About &amp; Data
+            </button>
           </div>
         </section>
 
@@ -114,15 +131,26 @@
         </section>
       </aside>
 
-      <main id="map"></main>
+      <main id="map" aria-label="Map"></main>
     </div>
 
     <!-- About Modal -->
     <div id="aboutModal" class="modal" style="display: none">
-      <div class="modal-content">
+      <div
+        class="modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="aboutTitle"
+      >
         <div class="modal-header">
-          <h3>ℹ️ About & Data</h3>
-          <button class="close-btn" onclick="closeAboutModal()">×</button>
+          <h3 id="aboutTitle">ℹ️ About &amp; Data</h3>
+          <button
+            class="close-btn"
+            id="aboutCloseBtn"
+            aria-label="Close about dialog"
+          >
+            ×
+          </button>
         </div>
         <div class="modal-body">
           <h4>Data Sources</h4>
@@ -136,26 +164,25 @@
             <li>Geometry simplified for web performance</li>
             <li>Areas calculated using equal-area projection</li>
             <li>Zoning codes classified into functional groups</li>
-            <li>Data optimized for free hosting platforms</li>
+            <li>Optimized for static hosting</li>
           </ul>
 
           <h4>Technical Details</h4>
           <ul>
-            <li>Built with MapLibre GL JS for vector tile support</li>
-            <li>Uses PMTiles format for efficient data delivery</li>
-            <li>Client-side filtering and analysis</li>
-            <li>Export functionality for filtered data</li>
+            <li>MapLibre GL JS + PMTiles</li>
+            <li>Client-side filtering &amp; export</li>
+            <li>Compact gold theme for print-friendly views</li>
           </ul>
 
-          <h4>Disclaimers</h4>
+          <h4>Disclaimer</h4>
           <p>
-            This is a demonstration application. For official zoning
-            information, please consult Orange County's official GIS portal.
+            This is a demonstration. For official zoning information, consult
+            Orange County's official GIS portal.
           </p>
         </div>
       </div>
     </div>
 
-    <script src="app_maplibre.js"></script>
+    <script defer src="app_maplibre.js"></script>
   </body>
 </html>
