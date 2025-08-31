@@ -984,25 +984,24 @@ function createAnalyticsPanel() {
   state.analyticsPanel.style.cssText = `
     position: absolute;
     bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(22, 26, 46, 0.95);
+    left: 380px;
+    background: rgba(22, 26, 46, 0.98);
     color: #e9edf5;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #2a3152;
-    font-family: Arial, sans-serif;
+    padding: 0;
+    border-radius: 16px;
+    border: 1px solid rgba(106, 166, 255, 0.2);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 12px;
     z-index: 1000;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    width: 75%;
-    max-width: 1000px;
-    height: 30vh;
-    max-height: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+    width: calc(100% - 420px);
+    max-width: 800px;
+    height: 35vh;
+    max-height: 450px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(20px);
   `;
 
   const header = document.createElement("div");
@@ -1010,37 +1009,41 @@ function createAnalyticsPanel() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
-    background: linear-gradient(135deg, #6aa6ff, #7ad0c9);
+    padding: 20px 24px;
+    background: linear-gradient(135deg, rgba(106, 166, 255, 0.95), rgba(122, 208, 201, 0.95));
     color: white;
-    border-radius: 8px 8px 0 0;
-    margin: -20px -20px 20px -20px;
+    border-radius: 16px 16px 0 0;
+    margin: 0;
+    position: relative;
+    overflow: hidden;
   `;
 
   const title = document.createElement("h3");
   title.textContent = "📈 Analytics Dashboard";
   title.style.cssText = `
     margin: 0;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   `;
 
   const closeBtn = document.createElement("button");
   closeBtn.textContent = "×";
   closeBtn.style.cssText = `
-    background: none;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
-    font-size: 24px;
+    font-size: 20px;
     cursor: pointer;
     padding: 0;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
   `;
   closeBtn.onclick = () => {
     state.analyticsPanel.style.display = "none";
@@ -1055,7 +1058,8 @@ function createAnalyticsPanel() {
     flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 20px;
+    gap: 24px;
+    padding: 24px;
     overflow: hidden;
   `;
 
@@ -1068,30 +1072,34 @@ function createAnalyticsPanel() {
   chartContainers.forEach((chartInfo) => {
     const container = document.createElement("div");
     container.style.cssText = `
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid #2a3152;
-      border-radius: 8px;
-      padding: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(106, 166, 255, 0.15);
+      border-radius: 12px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       min-height: 0;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
     `;
 
     const chartTitle = document.createElement("h4");
     chartTitle.textContent = chartInfo.title;
     chartTitle.style.cssText = `
-      margin: 0 0 12px 0;
-      font-size: 14px;
+      margin: 0 0 16px 0;
+      font-size: 15px;
       font-weight: 600;
       color: #6aa6ff;
       text-align: center;
+      letter-spacing: -0.01em;
     `;
 
     const canvas = document.createElement("canvas");
     canvas.id = chartInfo.id;
     canvas.style.cssText = `
       flex: 1;
-      max-height: 300px;
+      max-height: 320px;
+      border-radius: 8px;
     `;
 
     container.appendChild(chartTitle);
@@ -1152,27 +1160,33 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
       legend: {
         labels: {
           color: "#e9edf5",
-          font: { size: 8 },
+          font: { size: 10, weight: "500" },
           usePointStyle: true,
-          padding: 4,
+          padding: 6,
         },
       },
       tooltip: {
-        backgroundColor: "rgba(0,0,0,0.8)",
+        backgroundColor: "rgba(22, 26, 46, 0.95)",
         titleColor: "#e9edf5",
         bodyColor: "#e9edf5",
         borderColor: "#6aa6ff",
         borderWidth: 1,
+        cornerRadius: 8,
+        displayColors: true,
+        titleFont: { size: 12, weight: "600" },
+        bodyFont: { size: 11 },
       },
     },
     scales: {
       x: {
-        ticks: { color: "#9aa3b2", font: { size: 8 } },
-        grid: { color: "rgba(154, 163, 178, 0.1)" },
+        ticks: { color: "#9aa3b2", font: { size: 10, weight: "500" } },
+        grid: { color: "rgba(154, 163, 178, 0.08)", drawBorder: false },
+        border: { color: "rgba(154, 163, 178, 0.2)" },
       },
       y: {
-        ticks: { color: "#9aa3b2", font: { size: 8 } },
-        grid: { color: "rgba(154, 163, 178, 0.1)" },
+        ticks: { color: "#9aa3b2", font: { size: 10, weight: "500" } },
+        grid: { color: "rgba(154, 163, 178, 0.08)", drawBorder: false },
+        border: { color: "rgba(154, 163, 178, 0.2)" },
       },
     },
   };
@@ -1199,9 +1213,9 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
             backgroundColor: groupData.map(
               (r) => colors[r.key] || colors.Other
             ),
-            borderColor: "#2a3152",
+            borderColor: "rgba(106, 166, 255, 0.3)",
             borderWidth: 1,
-            borderRadius: 4,
+            borderRadius: 6,
             borderSkipped: false,
           },
         ],
@@ -1243,8 +1257,8 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
             pointBackgroundColor: "#6aa6ff",
             pointBorderColor: "#ffffff",
             pointBorderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 6,
+            pointRadius: 5,
+            pointHoverRadius: 7,
           },
         ],
       },
@@ -1294,8 +1308,8 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
           legend: {
             labels: {
               color: "#e9edf5",
-              font: { size: 7 },
-              padding: 3,
+              font: { size: 9, weight: "500" },
+              padding: 4,
             },
           },
           title: { display: false },
