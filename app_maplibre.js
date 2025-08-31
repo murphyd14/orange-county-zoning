@@ -984,7 +984,8 @@ function createAnalyticsPanel() {
   state.analyticsPanel.style.cssText = `
     position: absolute;
     bottom: 20px;
-    left: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     background: rgba(22, 26, 46, 0.95);
     color: #e9edf5;
     padding: 20px;
@@ -1001,6 +1002,7 @@ function createAnalyticsPanel() {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    backdrop-filter: blur(4px);
   `;
 
   const header = document.createElement("div");
@@ -1008,18 +1010,18 @@ function createAnalyticsPanel() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    padding: 16px 20px;
     background: linear-gradient(135deg, #6aa6ff, #7ad0c9);
     color: white;
     border-radius: 8px 8px 0 0;
-    margin: -20px -20px 12px -20px;
+    margin: -20px -20px 20px -20px;
   `;
 
   const title = document.createElement("h3");
   title.textContent = "📈 Analytics Dashboard";
   title.style.cssText = `
     margin: 0;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
   `;
 
@@ -1029,11 +1031,11 @@ function createAnalyticsPanel() {
     background: none;
     border: none;
     color: white;
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
     padding: 0;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1053,7 +1055,7 @@ function createAnalyticsPanel() {
     flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
+    gap: 20px;
     overflow: hidden;
   `;
 
@@ -1069,7 +1071,7 @@ function createAnalyticsPanel() {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid #2a3152;
       border-radius: 8px;
-      padding: 8px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       min-height: 0;
@@ -1078,8 +1080,8 @@ function createAnalyticsPanel() {
     const chartTitle = document.createElement("h4");
     chartTitle.textContent = chartInfo.title;
     chartTitle.style.cssText = `
-      margin: 0 0 6px 0;
-      font-size: 12px;
+      margin: 0 0 12px 0;
+      font-size: 14px;
       font-weight: 600;
       color: #6aa6ff;
       text-align: center;
@@ -1089,7 +1091,7 @@ function createAnalyticsPanel() {
     canvas.id = chartInfo.id;
     canvas.style.cssText = `
       flex: 1;
-      max-height: 120px;
+      max-height: 300px;
     `;
 
     container.appendChild(chartTitle);
