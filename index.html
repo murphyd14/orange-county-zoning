@@ -1,131 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Orange County Zoning Explorer - MapLibre</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
-  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-  <script src="https://unpkg.com/pmtiles@3.0.6/dist/pmtiles.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-</head>
-<body>
-  <div id="app">
-    <aside id="sidebar">
-      <h1>OCFL Zoning Explorer</h1>
-      
-      <section class="controls">
-        <h2>Filters</h2>
-        
-        <label>
-          Zoning Group
-          <select id="groupFilter">
-            <option value="ALL" selected>All Groups</option>
-            <option value="Residential">Residential</option>
-            <option value="Commercial">Commercial</option>
-            <option value="Industrial">Industrial</option>
-            <option value="Planned Development">Planned Development</option>
-            <option value="Agricultural">Agricultural</option>
-            <option value="Mixed Use">Mixed Use</option>
-            <option value="Incorporated">Incorporated</option>
-            <option value="Other">Other</option>
-          </select>
-        </label>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orange County Zoning Explorer - MapLibre</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/pmtiles@3.0.6/dist/pmtiles.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <aside id="sidebar">
+        <h1>OCFL Zoning Explorer</h1>
 
-        <label>
-          Year Range
-          <div class="range-inputs">
-            <input type="range" id="yearMin" min="1980" max="2030" value="1980" />
-            <span id="yearMinValue">1980</span>
-            <span>to</span>
-            <input type="range" id="yearMax" min="1980" max="2030" value="2030" />
-            <span id="yearMaxValue">2030</span>
-          </div>
-        </label>
+        <section class="controls">
+          <h2>Filters</h2>
 
-        <label>
-          Area Range (acres)
-          <div class="range-inputs">
-            <input type="range" id="areaMin" min="0" max="1000" value="0" />
-            <span id="areaMinValue">0</span>
-            <span>to</span>
-            <input type="range" id="areaMax" min="0" max="1000" value="1000" />
-            <span id="areaMaxValue">1000</span>
-          </div>
-        </label>
-
-        <label>
-          Search Properties
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search by zoning code, category, or PD name..."
-          />
-        </label>
-
-        <div class="toggle-group">
-          <label class="toggle-item">
-            <input type="checkbox" id="toggleZoning" checked />
-            <span>Zone Districts</span>
+          <label>
+            Zoning Group
+            <select id="groupFilter">
+              <option value="ALL" selected>All Groups</option>
+              <option value="Residential">Residential</option>
+              <option value="Commercial">Commercial</option>
+              <option value="Industrial">Industrial</option>
+              <option value="Planned Development">Planned Development</option>
+              <option value="Agricultural">Agricultural</option>
+              <option value="Mixed Use">Mixed Use</option>
+              <option value="Incorporated">Incorporated</option>
+              <option value="Other">Other</option>
+            </select>
           </label>
-          <label class="toggle-item">
-            <input type="checkbox" id="toggleFLU" />
-            <span>Future Land Use</span>
+
+          <label>
+            Year Range
+            <div class="range-inputs">
+              <input
+                type="range"
+                id="yearMin"
+                min="1980"
+                max="2030"
+                value="1980"
+              />
+              <span id="yearMinValue">1980</span>
+              <span>to</span>
+              <input
+                type="range"
+                id="yearMax"
+                min="1980"
+                max="2030"
+                value="2030"
+              />
+              <span id="yearMaxValue">2030</span>
+            </div>
           </label>
+
+          <label>
+            Area Range (acres)
+            <div class="range-inputs">
+              <input type="range" id="areaMin" min="0" max="1000" value="0" />
+              <span id="areaMinValue">0</span>
+              <span>to</span>
+              <input
+                type="range"
+                id="areaMax"
+                min="0"
+                max="1000"
+                value="1000"
+              />
+              <span id="areaMaxValue">1000</span>
+            </div>
+          </label>
+
+          <label>
+            Search Properties
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by zoning code, category, or PD name..."
+            />
+          </label>
+
+          <div class="toggle-group">
+            <label class="toggle-item">
+              <input type="checkbox" id="toggleZoning" checked />
+              <span>Zone Districts</span>
+            </label>
+            <label class="toggle-item">
+              <input type="checkbox" id="toggleFLU" />
+              <span>Future Land Use</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="actions">
+          <div class="button-group">
+            <button id="exportBtn" class="action-btn">📊 Export Data</button>
+            <button id="analyticsBtn" class="action-btn">
+              📈 Analytics Dashboard
+            </button>
+            <button id="aboutBtn" class="action-btn">ℹ️ About & Data</button>
+          </div>
+        </section>
+
+        <section id="details">
+          <h2>Selection</h2>
+          <div id="selectedInfo">Click a polygon on the map.</div>
+        </section>
+      </aside>
+
+      <main id="map"></main>
+    </div>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>ℹ️ About & Data</h3>
+          <button class="close-btn" onclick="closeAboutModal()">×</button>
         </div>
-      </section>
+        <div class="modal-body">
+          <h4>Data Sources</h4>
+          <p>
+            This application uses zoning and future land use data from Orange
+            County, Florida's public GIS services.
+          </p>
 
-      <section class="actions">
-        <div class="button-group">
-          <button id="exportBtn" class="action-btn">📊 Export Data</button>
-          <button id="analyticsBtn" class="action-btn">📈 Analytics Dashboard</button>
-          <button id="aboutBtn" class="action-btn">ℹ️ About & Data</button>
+          <h4>Data Processing</h4>
+          <ul>
+            <li>Geometry simplified for web performance</li>
+            <li>Areas calculated using equal-area projection</li>
+            <li>Zoning codes classified into functional groups</li>
+            <li>Data optimized for free hosting platforms</li>
+          </ul>
+
+          <h4>Technical Details</h4>
+          <ul>
+            <li>Built with MapLibre GL JS for vector tile support</li>
+            <li>Uses PMTiles format for efficient data delivery</li>
+            <li>Client-side filtering and analysis</li>
+            <li>Export functionality for filtered data</li>
+          </ul>
+
+          <h4>Disclaimers</h4>
+          <p>
+            This is a demonstration application. For official zoning
+            information, please consult Orange County's official GIS portal.
+          </p>
         </div>
-      </section>
-
-      <section id="details">
-        <h2>Selection</h2>
-        <div id="selectedInfo">Click a polygon on the map.</div>
-      </section>
-    </aside>
-
-    <main id="map"></main>
-  </div>
-
-  <!-- About Modal -->
-  <div id="aboutModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>ℹ️ About & Data</h3>
-        <button class="close-btn" onclick="closeAboutModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <h4>Data Sources</h4>
-        <p>This application uses zoning and future land use data from Orange County, Florida's public GIS services.</p>
-        
-        <h4>Data Processing</h4>
-        <ul>
-          <li>Geometry simplified for web performance</li>
-          <li>Areas calculated using equal-area projection</li>
-          <li>Zoning codes classified into functional groups</li>
-          <li>Data optimized for free hosting platforms</li>
-        </ul>
-        
-        <h4>Technical Details</h4>
-        <ul>
-          <li>Built with MapLibre GL JS for vector tile support</li>
-          <li>Uses PMTiles format for efficient data delivery</li>
-          <li>Client-side filtering and analysis</li>
-          <li>Export functionality for filtered data</li>
-        </ul>
-        
-        <h4>Disclaimers</h4>
-        <p>This is a demonstration application. For official zoning information, please consult Orange County's official GIS portal.</p>
       </div>
     </div>
-  </div>
 
-  <script src="app_maplibre.js"></script>
-</body>
+    <script src="app_maplibre.js"></script>
+  </body>
 </html>
