@@ -20,6 +20,7 @@ const state = {
   analyticsPanel: null,
   analyticsOpen: false,
   analyticsHandlersBound: false,
+  resizeTimeout: null,
 };
 
 const colors = {
@@ -80,7 +81,7 @@ function initMap() {
   state.map.on("load", async () => {
     await loadData(); // now it's safe to add sources/layers
     addLegend();
-    wireControls();   // hook up after data exists
+    wireControls(); // hook up after data exists
     // initial filter push
     updateLayerFilters();
   });
@@ -131,14 +132,21 @@ async function loadPMTilesData() {
       "fill-color": [
         "match",
         ["get", "z_group"],
-        "Residential", colors.Residential,
-        "Commercial", colors.Commercial,
-        "Industrial", colors.Industrial,
-        "Planned Development", colors["Planned Development"],
-        "Agricultural", colors.Agricultural,
-        "Mixed Use", colors["Mixed Use"],
-        "Incorporated", colors.Incorporated,
-        colors.Other
+        "Residential",
+        colors.Residential,
+        "Commercial",
+        colors.Commercial,
+        "Industrial",
+        colors.Industrial,
+        "Planned Development",
+        colors["Planned Development"],
+        "Agricultural",
+        colors.Agricultural,
+        "Mixed Use",
+        colors["Mixed Use"],
+        "Incorporated",
+        colors.Incorporated,
+        colors.Other,
       ],
       "fill-opacity": 0.8,
     },
@@ -169,8 +177,16 @@ async function loadPMTilesData() {
 
   // interactions
   state.map.on("click", "zoning-fill", (e) => selectFeature(e.features[0]));
-  state.map.on("mouseenter", "zoning-fill", () => (state.map.getCanvas().style.cursor = "pointer"));
-  state.map.on("mouseleave", "zoning-fill", () => (state.map.getCanvas().style.cursor = ""));
+  state.map.on(
+    "mouseenter",
+    "zoning-fill",
+    () => (state.map.getCanvas().style.cursor = "pointer")
+  );
+  state.map.on(
+    "mouseleave",
+    "zoning-fill",
+    () => (state.map.getCanvas().style.cursor = "")
+  );
 }
 
 async function loadOptimizedGeoJSON() {
@@ -195,14 +211,21 @@ async function loadOptimizedGeoJSON() {
       "fill-color": [
         "match",
         ["get", "z_group"],
-        "Residential", colors.Residential,
-        "Commercial", colors.Commercial,
-        "Industrial", colors.Industrial,
-        "Planned Development", colors["Planned Development"],
-        "Agricultural", colors.Agricultural,
-        "Mixed Use", colors["Mixed Use"],
-        "Incorporated", colors.Incorporated,
-        colors.Other
+        "Residential",
+        colors.Residential,
+        "Commercial",
+        colors.Commercial,
+        "Industrial",
+        colors.Industrial,
+        "Planned Development",
+        colors["Planned Development"],
+        "Agricultural",
+        colors.Agricultural,
+        "Mixed Use",
+        colors["Mixed Use"],
+        "Incorporated",
+        colors.Incorporated,
+        colors.Other,
       ],
       "fill-opacity": 0.8,
     },
@@ -226,8 +249,16 @@ async function loadOptimizedGeoJSON() {
   });
 
   state.map.on("click", "zoning-fill", (e) => selectFeature(e.features[0]));
-  state.map.on("mouseenter", "zoning-fill", () => (state.map.getCanvas().style.cursor = "pointer"));
-  state.map.on("mouseleave", "zoning-fill", () => (state.map.getCanvas().style.cursor = ""));
+  state.map.on(
+    "mouseenter",
+    "zoning-fill",
+    () => (state.map.getCanvas().style.cursor = "pointer")
+  );
+  state.map.on(
+    "mouseleave",
+    "zoning-fill",
+    () => (state.map.getCanvas().style.cursor = "")
+  );
 }
 
 function fitMapToDataIfGeoJSON() {
@@ -249,7 +280,9 @@ function fitMapToDataIfGeoJSON() {
 // --- Controls
 function wireUiBasics() {
   // About modal close (works even before map load)
-  document.getElementById("aboutCloseBtn").addEventListener("click", closeAboutModal);
+  document
+    .getElementById("aboutCloseBtn")
+    .addEventListener("click", closeAboutModal);
   document.getElementById("aboutBtn")?.addEventListener("click", () => {
     document.getElementById("aboutModal").style.display = "flex";
   });
@@ -362,8 +395,16 @@ function updateLayerFilters() {
   // Area (acres)
   const areaExpr = [
     "all",
-    [">=", ["to-number", ["coalesce", ["get", "area_acres"], 0]], state.filters.areaMin],
-    ["<=", ["to-number", ["coalesce", ["get", "area_acres"], 0]], state.filters.areaMax],
+    [
+      ">=",
+      ["to-number", ["coalesce", ["get", "area_acres"], 0]],
+      state.filters.areaMin,
+    ],
+    [
+      "<=",
+      ["to-number", ["coalesce", ["get", "area_acres"], 0]],
+      state.filters.areaMax,
+    ],
   ];
 
   // Search across fields (substring)
@@ -377,30 +418,45 @@ function updateLayerFilters() {
           ...searchFields.map((f) => [
             "all",
             ["has", f],
-            ["!=", ["index-of", term, ["downcase", ["to-string", ["get", f]]]], -1],
+            [
+              "!=",
+              ["index-of", term, ["downcase", ["to-string", ["get", f]]]],
+              -1,
+            ],
           ]),
         ];
 
   // Year filter:
   // - GeoJSON mode: we can't push a perfect year filter expression without knowing date format; handle in analytics/export.
   // - If the properties are numeric epoch millis, the below expression will work.
-  const [minMs, maxMs] = yearRangeToMs(state.filters.yearMin, state.filters.yearMax);
+  const [minMs, maxMs] = yearRangeToMs(
+    state.filters.yearMin,
+    state.filters.yearMax
+  );
   const numericYearExpr = [
     "any",
-    ["all",
+    [
+      "all",
       [">=", ["to-number", ["get", "BCC_DATE"]], minMs],
-      ["<=", ["to-number", ["get", "BCC_DATE"]], maxMs]
+      ["<=", ["to-number", ["get", "BCC_DATE"]], maxMs],
     ],
-    ["all",
+    [
+      "all",
       [">=", ["to-number", ["get", "P_Z_DATE"]], minMs],
-      ["<=", ["to-number", ["get", "P_Z_DATE"]], maxMs]
+      ["<=", ["to-number", ["get", "P_Z_DATE"]], maxMs],
     ],
-    ["all",
+    [
+      "all",
       [">=", ["to-number", ["get", "MAINT_DATE"]], minMs],
-      ["<=", ["to-number", ["get", "MAINT_DATE"]], maxMs]
+      ["<=", ["to-number", ["get", "MAINT_DATE"]], maxMs],
     ],
     // If dates are absent, we allow the feature (parity with previous logic)
-    ["all", ["!", ["has", "BCC_DATE"]], ["!", ["has", "P_Z_DATE"]], ["!", ["has", "MAINT_DATE"]]],
+    [
+      "all",
+      ["!", ["has", "BCC_DATE"]],
+      ["!", ["has", "P_Z_DATE"]],
+      ["!", ["has", "MAINT_DATE"]],
+    ],
   ];
 
   const finalExpr = ["all", groupExpr, areaExpr, searchExpr, numericYearExpr];
@@ -468,53 +524,86 @@ function selectFeature(feature) {
     `
     <div style="margin-bottom: 12px;">
       <span style="color:#6aa6ff;font-weight:bold;">Zoning Code:</span>
-      <span style="color:#e9edf5;font-weight:bold;"> ${props.ZONING || "—"}</span>
+      <span style="color:#e9edf5;font-weight:bold;"> ${
+        props.ZONING || "—"
+      }</span>
     </div>
     <div style="margin-bottom: 12px;">
       <span style="color:#7ad0c9;font-weight:bold;">Category:</span>
-      <span style="color:#e9edf5;font-weight:bold;"> ${props.z_group || "—"}</span>
+      <span style="color:#e9edf5;font-weight:bold;"> ${
+        props.z_group || "—"
+      }</span>
     </div>
-    ${props.PD_NAME ? `
+    ${
+      props.PD_NAME
+        ? `
     <div style="margin-bottom: 12px;">
       <span style="color:#ffb057;font-weight:bold;">PD Name:</span>
       <span style="color:#e9edf5;"> ${props.PD_NAME}</span>
-    </div>` : ""}
+    </div>`
+        : ""
+    }
 
-    ${props.ZONINGOLD ? `
+    ${
+      props.ZONINGOLD
+        ? `
     <div style="margin-bottom: 12px;">
       <span style="color:#c07bff;font-weight:bold;">Previous Zoning:</span>
       <span style="color:#e9edf5;"> ${props.ZONINGOLD}</span>
-    </div>` : ""}
+    </div>`
+        : ""
+    }
 
-    ${props.area_acres ? `
+    ${
+      props.area_acres
+        ? `
     <div style="margin-bottom: 12px;">
       <span style="color:#ffd86e;font-weight:bold;">Area:</span>
-      <span style="color:#e9edf5;"> ${Number(props.area_acres).toLocaleString(undefined, {maximumFractionDigits:2})} acres</span>
-    </div>` : ""}
+      <span style="color:#e9edf5;"> ${Number(props.area_acres).toLocaleString(
+        undefined,
+        { maximumFractionDigits: 2 }
+      )} acres</span>
+    </div>`
+        : ""
+    }
 
-    ${props.BCC_DATE ? `
+    ${
+      props.BCC_DATE
+        ? `
     <div style="margin-bottom: 12px;">
       <span style="color:#87d4a5;font-weight:bold;">BCC Date:</span>
       <span style="color:#e9edf5;"> ${formatDate(props.BCC_DATE)}</span>
-    </div>` : ""}
+    </div>`
+        : ""
+    }
 
-    ${props.P_Z_DATE ? `
+    ${
+      props.P_Z_DATE
+        ? `
     <div style="margin-bottom: 12px;">
       <span style="color:#778899;font-weight:bold;">Proposed Date:</span>
       <span style="color:#e9edf5;"> ${formatDate(props.P_Z_DATE)}</span>
-    </div>` : ""}
+    </div>`
+        : ""
+    }
 
-    ${props.MAINT_DATE ? `
+    ${
+      props.MAINT_DATE
+        ? `
     <div style="margin-bottom: 12px;">
       <span style="color:#b3b6c2;font-weight:bold;">Maintenance Date:</span>
       <span style="color:#e9edf5;"> ${formatDate(props.MAINT_DATE)}</span>
-    </div>` : ""}
+    </div>`
+        : ""
+    }
 
     ${
       props.centroid_lat && props.centroid_lon
         ? `<div style="margin-bottom:12px;">
              <span style="color:#6aa6ff;font-weight:bold;">Centroid:</span>
-             <span style="color:#e9edf5;"> ${Number(props.centroid_lat).toFixed(4)}, ${Number(props.centroid_lon).toFixed(4)}</span>
+             <span style="color:#e9edf5;"> ${Number(props.centroid_lat).toFixed(
+               4
+             )}, ${Number(props.centroid_lon).toFixed(4)}</span>
            </div>`
         : ""
     }
@@ -540,11 +629,15 @@ function addLegend() {
   `;
   legend.innerHTML = `
     <div style="margin-bottom:8px;font-weight:bold;color:#6aa6ff;">Zoning Categories</div>
-    ${Object.entries(colors).map(([label, color]) => `
+    ${Object.entries(colors)
+      .map(
+        ([label, color]) => `
       <div style="display:flex;align-items:center;margin-bottom:4px;">
         <div style="width:12px;height:12px;background:${color};border-radius:2px;margin-right:8px;"></div>
         <span>${label}</span>
-      </div>`).join("")}
+      </div>`
+      )
+      .join("")}
   `;
   document.getElementById("map").appendChild(legend);
 }
@@ -562,7 +655,10 @@ function exportFilteredData() {
   } else {
     // visible rendered features in the viewport
     features = getVisibleFilteredFeatures();
-    showNotification(`Vector tiles detected: exporting ${features.length} visible filtered feature(s).`, "info");
+    showNotification(
+      `Vector tiles detected: exporting ${features.length} visible filtered feature(s).`,
+      "info"
+    );
   }
 
   if (!features.length) {
@@ -585,7 +681,15 @@ function exportFilteredData() {
   const sample = features[0];
   const props = sample.properties || {};
   const fields = Object.keys(props);
-  const defaultFields = ["ZONING", "z_group", "area_acres", "PD_NAME", "BCC_DATE", "centroid_lat", "centroid_lon"];
+  const defaultFields = [
+    "ZONING",
+    "z_group",
+    "area_acres",
+    "PD_NAME",
+    "BCC_DATE",
+    "centroid_lat",
+    "centroid_lon",
+  ];
 
   exportContent.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
@@ -593,7 +697,9 @@ function exportFilteredData() {
       <button id="exportClose" style="background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;">×</button>
     </div>
     <p style="margin:0 0 12px 0; color: var(--muted);">
-      Export ${features.length.toLocaleString()} filtered ${mode === "geojson" ? "feature(s)" : "visible feature(s)"}.
+      Export ${features.length.toLocaleString()} filtered ${
+    mode === "geojson" ? "feature(s)" : "visible feature(s)"
+  }.
     </p>
 
     <div style="margin-bottom: 12px;">
@@ -608,11 +714,17 @@ function exportFilteredData() {
     <div style="margin-bottom: 12px;">
       <label style="display:block;margin-bottom:8px;">Include Fields:</label>
       <div id="fieldOptions" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;padding:8px;">
-        ${fields.map((f) => `
+        ${fields
+          .map(
+            (f) => `
           <label style="display:flex;align-items:center;margin-bottom:6px;font-size:12px;">
-            <input type="checkbox" value="${f}" ${defaultFields.includes(f) ? "checked" : ""} style="margin-right:8px;">${f}
+            <input type="checkbox" value="${f}" ${
+              defaultFields.includes(f) ? "checked" : ""
+            } style="margin-right:8px;">${f}
           </label>
-        `).join("")}
+        `
+          )
+          .join("")}
       </div>
     </div>
 
@@ -628,11 +740,15 @@ function exportFilteredData() {
   const close = () => exportModal.remove();
   document.getElementById("exportClose").onclick = close;
   document.getElementById("exportCancel").onclick = close;
-  exportModal.addEventListener("click", (e) => { if (e.target === exportModal) close(); });
+  exportModal.addEventListener("click", (e) => {
+    if (e.target === exportModal) close();
+  });
 
   document.getElementById("exportGo").onclick = () => {
     const format = document.getElementById("exportFormat").value;
-    const selectedFields = Array.from(document.querySelectorAll("#fieldOptions input[type='checkbox']:checked")).map((cb) => cb.value);
+    const selectedFields = Array.from(
+      document.querySelectorAll("#fieldOptions input[type='checkbox']:checked")
+    ).map((cb) => cb.value);
     if (!selectedFields.length) {
       showNotification("Please select at least one field to export", "error");
       return;
@@ -643,7 +759,10 @@ function exportFilteredData() {
       else exportToJSON(features, selectedFields);
 
       close();
-      showNotification(`Exported ${features.length.toLocaleString()} record(s) as ${format.toUpperCase()}`, "info");
+      showNotification(
+        `Exported ${features.length.toLocaleString()} record(s) as ${format.toUpperCase()}`,
+        "info"
+      );
     } catch (err) {
       showNotification(`Export failed: ${err.message}`, "error");
     }
@@ -656,7 +775,8 @@ function filterGeoJSONFeatures(all) {
   for (const feature of all) {
     const p = feature.properties || {};
     // group
-    if (state.filters.group !== "ALL" && p.z_group !== state.filters.group) continue;
+    if (state.filters.group !== "ALL" && p.z_group !== state.filters.group)
+      continue;
     // year: only enforce if we can parse a year at all
     const y = parseAnyYear(p);
     if (y && (y < state.filters.yearMin || y > state.filters.yearMax)) continue;
@@ -666,7 +786,9 @@ function filterGeoJSONFeatures(all) {
     // search
     if (state.filters.search) {
       const t = state.filters.search.toLowerCase();
-      const fields = [p.ZONING, p.z_group, p.PD_NAME, p.ZONINGOLD].map((v) => (v || "").toString().toLowerCase());
+      const fields = [p.ZONING, p.z_group, p.PD_NAME, p.ZONINGOLD].map((v) =>
+        (v || "").toString().toLowerCase()
+      );
       if (!fields.some((s) => s.includes(t))) continue;
     }
     out.push(feature);
@@ -687,8 +809,12 @@ function parseAnyYear(p) {
 // Visible features helper (vector or geojson)
 function getVisibleFilteredFeatures() {
   const canvas = state.map.getCanvas();
-  const bbox = [[0, 0], [canvas.width, canvas.height]];
-  let feats = state.map.queryRenderedFeatures(bbox, { layers: ["zoning-fill"] }) || [];
+  const bbox = [
+    [0, 0],
+    [canvas.width, canvas.height],
+  ];
+  let feats =
+    state.map.queryRenderedFeatures(bbox, { layers: ["zoning-fill"] }) || [];
   feats = dedupeFeatures(feats);
   return feats;
 }
@@ -705,7 +831,13 @@ function dedupeFeatures(features) {
       p.FID ??
       p.id ??
       // fallback: first coord hash
-      JSON.stringify((f.geometry && f.geometry.coordinates && f.geometry.coordinates[0] && f.geometry.coordinates[0][0]) || Math.random());
+      JSON.stringify(
+        (f.geometry &&
+          f.geometry.coordinates &&
+          f.geometry.coordinates[0] &&
+          f.geometry.coordinates[0][0]) ||
+          Math.random()
+      );
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(f);
@@ -727,7 +859,11 @@ function exportToCSV(features, fields) {
       })
       .join(",");
   });
-  downloadFile([header, ...rows].join("\n"), "orange_county_zoning_export.csv", "text/csv");
+  downloadFile(
+    [header, ...rows].join("\n"),
+    "orange_county_zoning_export.csv",
+    "text/csv"
+  );
 }
 
 function exportToGeoJSON(features, fields) {
@@ -736,26 +872,41 @@ function exportToGeoJSON(features, fields) {
     features: features.map((f) => ({
       type: "Feature",
       geometry: f.geometry,
-      properties: Object.fromEntries(fields.map((fld) => [fld, (f.properties || {})[fld]])),
+      properties: Object.fromEntries(
+        fields.map((fld) => [fld, (f.properties || {})[fld]])
+      ),
     })),
   };
-  downloadFile(JSON.stringify(gj, null, 2), "orange_county_zoning_export.geojson", "application/geo+json");
+  downloadFile(
+    JSON.stringify(gj, null, 2),
+    "orange_county_zoning_export.geojson",
+    "application/geo+json"
+  );
 }
 
 function exportToJSON(features, fields) {
   const arr = features.map((f) => ({
     ...f,
-    properties: Object.fromEntries(fields.map((fld) => [fld, (f.properties || {})[fld]])),
+    properties: Object.fromEntries(
+      fields.map((fld) => [fld, (f.properties || {})[fld]])
+    ),
   }));
-  downloadFile(JSON.stringify(arr, null, 2), "orange_county_zoning_export.json", "application/json");
+  downloadFile(
+    JSON.stringify(arr, null, 2),
+    "orange_county_zoning_export.json",
+    "application/json"
+  );
 }
 
 function downloadFile(content, filename, mimeType) {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); a.remove();
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
   URL.revokeObjectURL(url);
 }
 
@@ -866,101 +1017,169 @@ function updateAnalyticsFromMapView() {
   }
 
   // KPIs
-  document.getElementById("kpiCount").textContent = features.length.toLocaleString();
-  document.getElementById("kpiAcres").textContent = totalAcres.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  const topGroup = Object.entries(areaByGroup).sort((a, b) => b[1] - a[1])[0]?.[0] || "—";
+  document.getElementById("kpiCount").textContent =
+    features.length.toLocaleString();
+  document.getElementById("kpiAcres").textContent = totalAcres.toLocaleString(
+    undefined,
+    { maximumFractionDigits: 0 }
+  );
+  const topGroup =
+    Object.entries(areaByGroup).sort((a, b) => b[1] - a[1])[0]?.[0] || "—";
   document.getElementById("kpiTopGroup").textContent = topGroup;
-  document.getElementById("kpiYears").textContent = `${state.filters.yearMin}–${state.filters.yearMax}`;
+  document.getElementById(
+    "kpiYears"
+  ).textContent = `${state.filters.yearMin}–${state.filters.yearMax}`;
 
   // Charts
   createAnalyticsCharts(areaByGroup, countsByYear, areaByCode);
 }
 
 function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
+  // Detect mobile screen size
+  const isMobile = window.innerWidth <= 768;
+  const isSmallMobile = window.innerWidth <= 480;
+
+  const legendFontSize = isSmallMobile ? 8 : isMobile ? 9 : 10;
+  const axisFontSize = isSmallMobile ? 8 : isMobile ? 9 : 9;
+
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { labels: { color: "#e9edf5", font: { size: 10 }, usePointStyle: true, padding: 6 } },
+      legend: {
+        labels: {
+          color: "#e9edf5",
+          font: { size: legendFontSize },
+          usePointStyle: true,
+          padding: isMobile ? 4 : 6,
+          boxWidth: isMobile ? 12 : 16,
+          boxHeight: isMobile ? 8 : 12,
+        },
+      },
       tooltip: {
         backgroundColor: "rgba(0,0,0,0.8)",
         titleColor: "#e9edf5",
         bodyColor: "#e9edf5",
         borderColor: "#6aa6ff",
         borderWidth: 1,
+        titleFont: { size: isMobile ? 11 : 13 },
+        bodyFont: { size: isMobile ? 10 : 12 },
       },
     },
     scales: {
-      x: { ticks: { color: "#9aa3b2", font: { size: 9 } }, grid: { color: "rgba(154,163,178,0.1)" } },
-      y: { ticks: { color: "#9aa3b2", font: { size: 9 } }, grid: { color: "rgba(154,163,178,0.1)" } },
+      x: {
+        ticks: {
+          color: "#9aa3b2",
+          font: { size: axisFontSize },
+        },
+        grid: { color: "rgba(154,163,178,0.1)" },
+      },
+      y: {
+        ticks: {
+          color: "#9aa3b2",
+          font: { size: axisFontSize },
+        },
+        grid: { color: "rgba(154,163,178,0.1)" },
+      },
     },
   };
 
   // Area by group
   const ctx1 = document.getElementById("chartAreaByGroup");
   if (state.charts.areaByGroup) state.charts.areaByGroup.destroy();
-  const groupData = Object.entries(areaByGroup).map(([key, v]) => ({ key, area_acres: v })).sort((a, b) => b.area_acres - a.area_acres);
+  const groupData = Object.entries(areaByGroup)
+    .map(([key, v]) => ({ key, area_acres: v }))
+    .sort((a, b) => b.area_acres - a.area_acres);
   state.charts.areaByGroup = new Chart(ctx1, {
     type: "bar",
     data: {
       labels: groupData.map((r) => r.key),
-      datasets: [{
-        label: "Acres",
-        data: groupData.map((r) => r.area_acres),
-        backgroundColor: groupData.map((r) => colors[r.key] || colors.Other),
-        borderColor: "#2a3152",
-        borderWidth: 1,
-        borderRadius: 4,
-        borderSkipped: false,
-      }],
+      datasets: [
+        {
+          label: "Acres",
+          data: groupData.map((r) => r.area_acres),
+          backgroundColor: groupData.map((r) => colors[r.key] || colors.Other),
+          borderColor: "#2a3152",
+          borderWidth: 1,
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+      ],
     },
-    options: { ...commonOptions, interaction: { intersect: false, mode: "index" } },
+    options: {
+      ...commonOptions,
+      interaction: { intersect: false, mode: "index" },
+    },
   });
 
   // Counts by year
   const ctx2 = document.getElementById("chartCountsByYear");
   if (state.charts.countsByYear) state.charts.countsByYear.destroy();
-  const yearData = Object.entries(countsByYear).map(([y, c]) => ({ y: Number(y), c })).sort((a, b) => a.y - b.y);
+  const yearData = Object.entries(countsByYear)
+    .map(([y, c]) => ({ y: Number(y), c }))
+    .sort((a, b) => a.y - b.y);
   state.charts.countsByYear = new Chart(ctx2, {
     type: "line",
     data: {
       labels: yearData.map((r) => r.y),
-      datasets: [{
-        label: "Rezonings",
-        data: yearData.map((r) => r.c),
-        tension: 0.35,
-        borderColor: "#6aa6ff",
-        backgroundColor: "rgba(106,166,255,0.1)",
-        fill: true,
-        pointBackgroundColor: "#6aa6ff",
-        pointBorderColor: "#ffffff",
-        pointBorderWidth: 2,
-        pointRadius: 3,
-        pointHoverRadius: 5,
-      }],
+      datasets: [
+        {
+          label: "Rezonings",
+          data: yearData.map((r) => r.c),
+          tension: 0.35,
+          borderColor: "#6aa6ff",
+          backgroundColor: "rgba(106,166,255,0.1)",
+          fill: true,
+          pointBackgroundColor: "#6aa6ff",
+          pointBorderColor: "#ffffff",
+          pointBorderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+        },
+      ],
     },
-    options: { ...commonOptions, interaction: { intersect: false, mode: "index" } },
+    options: {
+      ...commonOptions,
+      interaction: { intersect: false, mode: "index" },
+    },
   });
 
   // Area by code
   const ctx3 = document.getElementById("chartAreaByCode");
   if (state.charts.areaByCode) state.charts.areaByCode.destroy();
-  const codeData = Object.entries(areaByCode).map(([k, v]) => ({ k, v })).sort((a, b) => b.v - a.v).slice(0, 15);
+  const codeData = Object.entries(areaByCode)
+    .map(([k, v]) => ({ k, v }))
+    .sort((a, b) => b.v - a.v)
+    .slice(0, 15);
   state.charts.areaByCode = new Chart(ctx3, {
     type: "doughnut",
     data: {
       labels: codeData.map((r) => r.k),
-      datasets: [{
-        data: codeData.map((r) => r.v),
-        backgroundColor: codeData.map((_, i) => `hsl(${(i * 137.508) % 360}, 70%, 60%)`),
-        borderWidth: 2,
-        borderColor: "#2a3152",
-      }],
+      datasets: [
+        {
+          data: codeData.map((r) => r.v),
+          backgroundColor: codeData.map(
+            (_, i) => `hsl(${(i * 137.508) % 360}, 70%, 60%)`
+          ),
+          borderWidth: 2,
+          borderColor: "#2a3152",
+        },
+      ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: "#e9edf5", font: { size: 9 }, padding: 6 } } },
+      plugins: {
+        legend: {
+          labels: {
+            color: "#e9edf5",
+            font: { size: legendFontSize },
+            padding: isMobile ? 4 : 6,
+            boxWidth: isMobile ? 12 : 16,
+            boxHeight: isMobile ? 8 : 12,
+          },
+        },
+      },
     },
   });
 }
@@ -969,7 +1188,9 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
 function showNotification(message, type = "info") {
   const n = document.createElement("div");
   n.style.cssText = `
-    position:fixed; top:20px; right:20px; background:${type === "error" ? "#dc3545" : "#28a745"};
+    position:fixed; top:20px; right:20px; background:${
+      type === "error" ? "#dc3545" : "#28a745"
+    };
     color:white; padding:12px 20px; border-radius:6px; font-size:14px; z-index:3000; box-shadow:0 4px 12px rgba(0,0,0,0.3);
   `;
   n.textContent = message;
@@ -992,3 +1213,14 @@ function debounce(fn, ms) {
 
 // --- Start
 document.addEventListener("DOMContentLoaded", init);
+
+// Handle window resize for analytics charts
+window.addEventListener("resize", () => {
+  if (state.analyticsOpen && state.analyticsPanel) {
+    // Debounce the resize to avoid too many updates
+    clearTimeout(state.resizeTimeout);
+    state.resizeTimeout = setTimeout(() => {
+      updateAnalyticsFromMapView();
+    }, 250);
+  }
+});

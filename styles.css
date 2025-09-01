@@ -281,8 +281,8 @@ section h3 {
   font-size: 24px;
   cursor: pointer;
   padding: 0;
-  width: 30px;
-  height: 30px;
+  min-width: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -483,6 +483,7 @@ section h3 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 @media (max-width: 768px) {
   #app {
     grid-template-columns: 1fr;
@@ -506,10 +507,119 @@ section h3 {
     min-width: 120px;
   }
 
+  /* Analytics Panel Mobile Improvements */
   .analytics-panel {
-    inset: 8px;
-    width: calc(100vw - 16px);
-    height: calc(100vh - 16px);
-    border-radius: 12px;
+    inset: 4px;
+    width: calc(100vw - 8px);
+    height: calc(100vh - 8px);
+    border-radius: 8px;
+    padding: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .analytics-header {
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+
+  .analytics-header h3 {
+    font-size: 16px !important;
+  }
+
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .kpi {
+    padding: 8px 10px;
+  }
+
+  .kpi .value {
+    font-size: 16px;
+  }
+
+  .analytics-grid {
+    gap: 12px;
+  }
+
+  .chart-container {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .chart-container h4 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .chart-container canvas {
+    height: 300px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics-panel {
+    inset: 2px;
+    width: calc(100vw - 4px);
+    height: calc(100vh - 4px);
+    border-radius: 6px;
+    padding: 8px;
+  }
+
+  .analytics-header {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+  }
+
+  .analytics-header h3 {
+    font-size: 14px !important;
+  }
+
+  .kpi-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .kpi {
+    padding: 6px 8px;
+  }
+
+  .kpi .value {
+    font-size: 14px;
+  }
+
+  .analytics-grid {
+    gap: 8px;
+  }
+
+  .chart-container {
+    padding: 8px;
+  }
+
+  .chart-container h4 {
+    font-size: 12px;
+  }
+
+  .chart-container canvas {
+    height: 250px !important;
+  }
+
+  /* Touch-friendly improvements for mobile */
+  .analytics-panel {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Make close button easier to tap on mobile */
+  .close-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
   }
 }
