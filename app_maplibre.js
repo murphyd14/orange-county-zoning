@@ -426,9 +426,7 @@ function updateLayerFilters() {
           ]),
         ];
 
-  // Year filter:
-  // - GeoJSON mode: we can't push a perfect year filter expression without knowing date format; handle in analytics/export.
-  // - If the properties are numeric epoch millis, the below expression will work.
+  // Year filter
   const [minMs, maxMs] = yearRangeToMs(
     state.filters.yearMin,
     state.filters.yearMax
@@ -450,7 +448,6 @@ function updateLayerFilters() {
       [">=", ["to-number", ["get", "MAINT_DATE"]], minMs],
       ["<=", ["to-number", ["get", "MAINT_DATE"]], maxMs],
     ],
-    // If dates are absent, we allow the feature (parity with previous logic)
     [
       "all",
       ["!", ["has", "BCC_DATE"]],
@@ -619,27 +616,43 @@ function formatDate(value) {
   return isNaN(d) ? "—" : d.toISOString().slice(0, 10);
 }
 
-// --- Legend
+// --- Legend (collapsible + compact on mobile)
 function addLegend() {
   const legend = document.createElement("div");
-  legend.style.cssText = `
-    position:absolute; bottom:20px; right:20px; background:rgba(22,26,46,0.9);
-    color:#e9edf5; padding:12px; border-radius:8px; border:1px solid #2a3152;
-    font-size:12px; z-index:1000; box-shadow:0 4px 16px rgba(0,0,0,0.3);
-  `;
-  legend.innerHTML = `
-    <div style="margin-bottom:8px;font-weight:bold;color:#6aa6ff;">Zoning Categories</div>
-    ${Object.entries(colors)
-      .map(
-        ([label, color]) => `
-      <div style="display:flex;align-items:center;margin-bottom:4px;">
-        <div style="width:12px;height:12px;background:${color};border-radius:2px;margin-right:8px;"></div>
-        <span>${label}</span>
+  legend.className = "map-legend";
+
+  const header = document.createElement("div");
+  header.className = "legend-header";
+  header.innerHTML = `<span>Zoning Categories</span><button class="legend-toggle" aria-label="Toggle legend">–</button>`;
+
+  const list = document.createElement("div");
+  list.className = "legend-list";
+  list.innerHTML = Object.entries(colors)
+    .map(
+      ([label, color]) => `
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:${color}"></div>
+        <span class="legend-label">${label}</span>
       </div>`
-      )
-      .join("")}
-  `;
+    )
+    .join("");
+
+  legend.appendChild(header);
+  legend.appendChild(list);
   document.getElementById("map").appendChild(legend);
+
+  // Toggle collapse
+  const toggleBtn = legend.querySelector(".legend-toggle");
+  toggleBtn.addEventListener("click", () => {
+    legend.classList.toggle("collapsed");
+    toggleBtn.textContent = legend.classList.contains("collapsed") ? "+" : "–";
+  });
+
+  // Default to collapsed on small screens
+  if (window.innerWidth <= 768) {
+    legend.classList.add("collapsed");
+    toggleBtn.textContent = "+";
+  }
 }
 
 // --- Export
@@ -1038,6 +1051,8 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
   // Detect mobile screen size
   const isMobile = window.innerWidth <= 768;
   const isSmallMobile = window.innerWidth <= 480;
+  const legendLimit =
+    window.innerWidth <= 480 ? 4 : window.innerWidth <= 768 ? 6 : Infinity;
 
   const legendFontSize = isSmallMobile ? 8 : isMobile ? 9 : 10;
   const axisFontSize = isSmallMobile ? 8 : isMobile ? 9 : 9;
@@ -1066,7 +1081,6 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
           boxHeight: isMobile ? 6 : 12,
           generateLabels: isMobile
             ? (chart) => {
-                // For mobile, show fewer legend items or make them more compact
                 const labels =
                   Chart.defaults.plugins.legend.labels.generateLabels(chart);
                 return labels.slice(0, isSmallMobile ? 4 : 6); // Limit legend items on mobile
@@ -1162,13 +1176,15 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
     },
   });
 
-  // Area by code
+  // Area by code (doughnut) with mobile legend limiting
   const ctx3 = document.getElementById("chartAreaByCode");
   if (state.charts.areaByCode) state.charts.areaByCode.destroy();
+
   const codeData = Object.entries(areaByCode)
     .map(([k, v]) => ({ k, v }))
     .sort((a, b) => b.v - a.v)
-    .slice(0, 15);
+    .slice(0, Math.min(15, legendLimit)); // limit more on mobile
+
   state.charts.areaByCode = new Chart(ctx3, {
     type: "doughnut",
     data: {
@@ -1189,13 +1205,29 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
+          position: "bottom",
           labels: {
             color: "#e9edf5",
             font: { size: legendFontSize },
             padding: isMobile ? 4 : 6,
             boxWidth: isMobile ? 12 : 16,
             boxHeight: isMobile ? 8 : 12,
+            generateLabels: isMobile
+              ? (chart) =>
+                  Chart.defaults.plugins.legend.labels
+                    .generateLabels(chart)
+                    .slice(0, legendLimit)
+              : undefined,
           },
+        },
+        tooltip: {
+          backgroundColor: "rgba(0,0,0,0.8)",
+          titleColor: "#e9edf5",
+          bodyColor: "#e9edf5",
+          borderColor: "#6aa6ff",
+          borderWidth: 1,
+          titleFont: { size: isMobile ? 11 : 13 },
+          bodyFont: { size: isMobile ? 10 : 12 },
         },
       },
     },

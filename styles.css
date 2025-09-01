@@ -326,12 +326,14 @@ section h3 {
 
 /* Full-screen-ish, centered, scrollable */
 .analytics-panel {
-  position: fixed; /* keep it above the map and centered */
-  top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(1400px, calc(100vw - 48px));
-  height: calc(100vh - 48px);
+  position: fixed;
+  inset: 24px 24px; /* top/right/bottom/left in one line */
+  left: 0; /* ensure both sides exist */
+  right: 0;
+  transform: none; /* kill translate hack */
+  width: min(1400px, 100dvw - 48px);
+  height: calc(100dvh - 48px);
+  margin: 0 auto;
   background: rgba(22, 26, 46, 0.95);
   color: #e9edf5;
   padding: 20px;
@@ -343,10 +345,29 @@ section h3 {
   display: none; /* toggled by JS */
   flex-direction: column;
   backdrop-filter: blur(4px);
-  overflow: auto; /* allow content to scroll if needed */
-  /* Ensure proper centering */
-  right: auto;
-  margin: 0 auto;
+  overflow: auto;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .analytics-panel {
+    inset: 4px; /* tight margins all around */
+    width: calc(100dvw - 8px);
+    height: calc(100dvh - 8px);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 480px) {
+  .analytics-panel {
+    inset: 2px;
+    width: calc(100dvw - 4px);
+    height: calc(100dvh - 4px);
+    border-radius: 6px;
+    padding: 8px;
+    margin: 0 auto;
+  }
 }
 
 .analytics-header {
@@ -508,6 +529,97 @@ section h3 {
   .action-btn {
     flex: 1;
     min-width: 120px;
+  }
+
+  .map-legend {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(22, 26, 46, 0.9);
+    color: #e9edf5;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    z-index: 1000;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    max-width: 220px;
+  }
+  .legend-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-weight: 600;
+    color: #6aa6ff;
+    margin-bottom: 8px;
+  }
+  .legend-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    color: #e9edf5;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 20px;
+    padding: 0;
+  }
+  .legend-list {
+    display: grid;
+    grid-auto-rows: min-content;
+    gap: 4px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+
+  /* Compact on tablets/phones */
+  @media (max-width: 768px) {
+    .map-legend {
+      bottom: 8px;
+      right: 8px;
+      padding: 8px;
+      font-size: 11px;
+      max-width: 180px;
+    }
+    .legend-item {
+      gap: 6px;
+    }
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+    }
+    /* Show fewer items automatically; keep it minimal */
+    .legend-list .legend-item:nth-of-type(n + 6) {
+      display: none;
+    } /* keep first 5 */
+  }
+
+  /* Phone */
+  @media (max-width: 480px) {
+    .map-legend {
+      bottom: 6px;
+      right: 6px;
+      padding: 6px;
+      font-size: 10px;
+      max-width: 160px;
+    }
+    .legend-list .legend-item:nth-of-type(n + 5) {
+      display: none;
+    } /* keep first 4 */
+  }
+
+  /* Collapsed state: show just the header bar */
+  .map-legend.collapsed .legend-list {
+    display: none;
   }
 
   /* Analytics Panel Mobile Improvements */
