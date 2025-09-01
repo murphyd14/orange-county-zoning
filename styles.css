@@ -327,11 +327,11 @@ section h3 {
 /* Full-screen-ish, centered, scrollable */
 .analytics-panel {
   position: fixed; /* keep it above the map and centered */
-  inset: 24px; /* margin around edges */
+  top: 24px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(1400px, 96vw);
-  height: calc(96vh - 48px);
+  width: min(1400px, calc(100vw - 48px));
+  height: calc(100vh - 48px);
   background: rgba(22, 26, 46, 0.95);
   color: #e9edf5;
   padding: 20px;
@@ -344,6 +344,9 @@ section h3 {
   flex-direction: column;
   backdrop-filter: blur(4px);
   overflow: auto; /* allow content to scroll if needed */
+  /* Ensure proper centering */
+  right: auto;
+  margin: 0 auto;
 }
 
 .analytics-header {
@@ -509,13 +512,13 @@ section h3 {
 
   /* Analytics Panel Mobile Improvements */
   .analytics-panel {
-    inset: 4px;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
     width: calc(100vw - 8px);
     height: calc(100vh - 8px);
     border-radius: 8px;
     padding: 12px;
-    left: 50%;
-    transform: translateX(-50%);
   }
 
   .analytics-header {
@@ -562,7 +565,9 @@ section h3 {
 
 @media (max-width: 480px) {
   .analytics-panel {
-    inset: 2px;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
     width: calc(100vw - 4px);
     height: calc(100vh - 4px);
     border-radius: 6px;
@@ -621,5 +626,11 @@ section h3 {
     align-items: center;
     justify-content: center;
     font-size: 20px;
+  }
+
+  /* Ensure charts are properly sized on mobile */
+  .chart-container canvas {
+    max-width: 100% !important;
+    max-height: 250px !important;
   }
 }

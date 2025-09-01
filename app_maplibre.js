@@ -1042,18 +1042,36 @@ function createAnalyticsCharts(areaByGroup, countsByYear, areaByCode) {
   const legendFontSize = isSmallMobile ? 8 : isMobile ? 9 : 10;
   const axisFontSize = isSmallMobile ? 8 : isMobile ? 9 : 9;
 
+  // Debug logging
+  console.log("Analytics Chart Creation:", {
+    windowWidth: window.innerWidth,
+    isMobile,
+    isSmallMobile,
+    legendFontSize,
+    axisFontSize,
+  });
+
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
+        position: isMobile ? "bottom" : "top",
         labels: {
           color: "#e9edf5",
           font: { size: legendFontSize },
           usePointStyle: true,
-          padding: isMobile ? 4 : 6,
-          boxWidth: isMobile ? 12 : 16,
-          boxHeight: isMobile ? 8 : 12,
+          padding: isMobile ? 2 : 6,
+          boxWidth: isMobile ? 10 : 16,
+          boxHeight: isMobile ? 6 : 12,
+          generateLabels: isMobile
+            ? (chart) => {
+                // For mobile, show fewer legend items or make them more compact
+                const labels =
+                  Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                return labels.slice(0, isSmallMobile ? 4 : 6); // Limit legend items on mobile
+              }
+            : undefined,
         },
       },
       tooltip: {
